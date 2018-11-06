@@ -1,0 +1,12 @@
+html,
+body,
+.app {
+  height: 100vh;
+  background: #eee;
+  padding: 1em;
+}
+
+.ui,
+.field input {
+  border-radius: 0px !important;
+}
