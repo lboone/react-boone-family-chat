@@ -1,10 +1,12 @@
 import React from "react";
 import uuidv4 from "uuid/v4";
 import firebase from "../../firebase";
-import { Segment, Button, Input } from "semantic-ui-react";
+import { Segment, Button, Input, Message } from "semantic-ui-react";
 
 import FileModal from "./FileModal";
 import ProgressBar from "./ProgressBar";
+
+import Filter from "bad-words";
 
 class MessageForm extends React.Component {
   state = {
@@ -17,12 +19,19 @@ class MessageForm extends React.Component {
     user: this.props.currentUser,
     loading: false,
     errors: [],
-    modal: false
+    modal: false,
+    privateChannel: this.props.isPrivateChannel
   };
 
   openModal = () => this.setState({ modal: true });
 
   closeModal = () => this.setState({ modal: false });
+  displayErrors = errors =>
+    errors.map((error, i) => <p key={i}>{error.message}</p>);
+
+  clearErrors = () => {
+    setTimeout(() => this.setState({ errors: [] }), 2000);
+  };
 
   handleChange = event => {
     this.setState({ [event.target.name]: event.target.value });
@@ -46,25 +55,34 @@ class MessageForm extends React.Component {
   };
 
   sendMessage = () => {
-    const { messagesRef } = this.props;
+    const { getMessagesRef } = this.props;
     const { message, channel } = this.state;
 
     if (message) {
-      this.setState({ loading: true });
-      messagesRef
-        .child(channel.id)
-        .push()
-        .set(this.createMessage())
-        .then(() => {
-          this.setState({ loading: false, message: "", errors: [] });
-        })
-        .catch(err => {
-          console.error(err);
-          this.setState({
-            loading: false,
-            errors: this.state.errors.concat(err)
-          });
+      const filter = new Filter();
+      if (filter.isProfane(message)) {
+        this.setState({
+          errors: this.state.errors.concat({
+            message: `Please clean up your message: ${filter.clean(message)}`
+          })
         });
+      } else {
+        this.setState({ loading: true });
+        getMessagesRef()
+          .child(channel.id)
+          .push()
+          .set(this.createMessage())
+          .then(() => {
+            this.setState({ loading: false, message: "", errors: [] });
+          })
+          .catch(err => {
+            console.error(err);
+            this.setState({
+              loading: false,
+              errors: this.state.errors.concat(err)
+            });
+          });
+      }
     } else {
       this.setState({
         errors: this.state.errors.concat({ message: "Add a message" })
@@ -72,10 +90,18 @@ class MessageForm extends React.Component {
     }
   };
 
+  getPath = () => {
+    if (this.state.privateChannel) {
+      return `chat/private-${this.state.channel.id}`;
+    } else {
+      return "chat/public";
+    }
+  };
+
   uploadFile = (file, metadata) => {
     const pathToUpload = this.state.channel.id;
-    const ref = this.props.messagesRef;
-    const filePath = `chat/public/${uuidv4()}.jpg`;
+    const ref = this.props.getMessagesRef();
+    const filePath = `${this.getPath()}/${uuidv4()}.jpg`;
 
     this.setState(
       {
@@ -156,6 +182,14 @@ class MessageForm extends React.Component {
           }
           placeholder="Write your message"
         />
+        {errors.length > 0 && (
+          <Message error>
+            <h3>Error</h3>
+            {this.displayErrors(errors)}
+            {this.clearErrors()}
+          </Message>
+        )}
+
         <Button.Group icon widths="2">
           <Button
             onClick={this.sendMessage}

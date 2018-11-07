@@ -12,6 +12,11 @@ input {
   border-radius: 0px !important;
 }
 
+/* SidePanel.js */
+.menu {
+  padding-bottom: 2em;
+}
+
 /* Messages */
 
 .messages {
