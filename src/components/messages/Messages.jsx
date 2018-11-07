@@ -27,6 +27,10 @@ class Messages extends Component {
     }
   }
 
+  componentWillUnmount() {
+    this.removeListener();
+  }
+
   addListeners = channelId => {
     this.addMessageListener(channelId);
   };
@@ -40,6 +44,10 @@ class Messages extends Component {
       this.setState({ messages: loadedMessages, messagesLoading: false });
       this.countUniqueUsers(loadedMessages);
     });
+  };
+
+  removeListener = () => {
+    this.getMessagesRef().off();
   };
 
   getMessagesRef = () => {
