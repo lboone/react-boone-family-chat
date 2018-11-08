@@ -3,7 +3,6 @@ body,
 .app {
   height: 100vh;
   background: #eee;
-  padding: 1em;
 }
 
 .ui,
@@ -11,12 +10,18 @@ body,
 input {
   border-radius: 0px !important;
 }
+div.ui.red.label {
+  border-radius: 4px !important;
+}
 
 /* SidePanel.js */
 .menu {
   padding-bottom: 2em;
 }
 
+.ui.comments {
+  max-width: 100% !important;
+}
 /* Messages */
 
 .messages {
@@ -48,4 +53,27 @@ input {
 /* ProgressBar.jsx */
 .progress__bar {
   margin: 0.3em 0 0 0 !important;
+}
+
+/*  ColorPanel.jsx */
+.color__container {
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  width: 35px;
+  border-radius: 3px;
+}
+.color__square {
+  width: 35px;
+  height: 35px;
+}
+.color__overlay {
+  width: 85px;
+  height: 35px;
+  transform: rotate(225deg);
+}
+
+.color__remove {
+  cursor: pointer;
+  margin-left: 25px !important;
 }

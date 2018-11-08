@@ -167,6 +167,7 @@ class Channels extends React.Component {
 
     if (count > 0) return count;
   };
+
   displayChannels = channels =>
     channels.length > 0 &&
     channels.map(channel => (
@@ -183,6 +184,7 @@ class Channels extends React.Component {
         # {channel.name}
       </Menu.Item>
     ));
+
   render() {
     const { channels, modal } = this.state;
     return (
