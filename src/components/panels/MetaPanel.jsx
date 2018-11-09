@@ -57,7 +57,9 @@ class MetaPanel extends Component {
             Channel Details
           </Accordion.Title>
           <Accordion.Content active={activeIndex === 0}>
-            {channel && channel.details}
+            <div style={{ marginLeft: 25 }}>
+              <h3>{channel && channel.details}</h3>
+            </div>
           </Accordion.Content>
 
           <Accordion.Title

@@ -1,7 +1,9 @@
 import React from "react";
 import uuidv4 from "uuid/v4";
 import firebase from "../../firebase";
-import { Segment, Button, Input, Message } from "semantic-ui-react";
+import { Segment, Button, Input, Message} from "semantic-ui-react";
+import { Picker, emojiIndex } from "emoji-mart";
+import "emoji-mart/css/emoji-mart.css";
 
 import FileModal from "./FileModal";
 import ProgressBar from "./ProgressBar";
@@ -11,6 +13,7 @@ import Filter from "bad-words";
 class MessageForm extends React.Component {
   state = {
     storageRef: firebase.storage().ref(),
+    typingRef: firebase.database().ref("typing"),
     uploadTask: null,
     uploadState: "",
     percentUploaded: 0,
@@ -20,7 +23,8 @@ class MessageForm extends React.Component {
     loading: false,
     errors: [],
     modal: false,
-    privateChannel: this.props.isPrivateChannel
+    privateChannel: this.props.isPrivateChannel,
+    emojiPicker: false
   };
 
   openModal = () => this.setState({ modal: true });
@@ -56,7 +60,7 @@ class MessageForm extends React.Component {
 
   sendMessage = () => {
     const { getMessagesRef } = this.props;
-    const { message, channel } = this.state;
+    const { message, channel, typingRef, user } = this.state;
 
     if (message) {
       const filter = new Filter();
@@ -74,6 +78,10 @@ class MessageForm extends React.Component {
           .set(this.createMessage())
           .then(() => {
             this.setState({ loading: false, message: "", errors: [] });
+            typingRef
+              .child(channel.id)
+              .child(user.uid)
+              .remove();
           })
           .catch(err => {
             console.error(err);
@@ -160,20 +168,83 @@ class MessageForm extends React.Component {
         });
       });
   };
+  handleKeyDown = () => {
+    const { message, typingRef, channel, user } = this.state;
+    if (message) {
+      typingRef
+        .child(channel.id)
+        .child(user.uid)
+        .set(user.displayName);
+    } else {
+      typingRef
+        .child(channel.id)
+        .child(user.uid)
+        .remove();
+    }
+  };
 
+  handleTogglePicker = () => {
+    this.setState({ emojiPicker: !this.state.emojiPicker });
+  };
+
+  handleAddEmoji = emoji => {
+    const oldMessage = this.state.message;
+    const newMessage = this.colonToUnicode(` ${oldMessage} ${emoji.colons} `);
+    this.setState({ message: newMessage });
+  };
+
+  handleCloseAddEmoji = () => {
+    this.setState({ emojiPicker: false }, () => {
+      setTimeout(() => this.messageInputRef.focus(), 0);
+    });
+  };
+  colonToUnicode = message => {
+    return message.replace(/:[A-Za-z0-9_+-]+:/g, x => {
+      x = x.replace(/:/g, "");
+      let emoji = emojiIndex.emojis[x];
+      if (typeof emoji !== "undefined") {
+        let unicode = emoji.native;
+        if (typeof unicode !== "undefined") {
+          return unicode;
+        }
+      }
+      x = ":" + x + ":";
+      return x;
+    });
+  };
   render() {
     // prettier-ignore
-    const { errors, message, loading, modal, uploadState, percentUploaded } = this.state;
+    const { errors, message, loading, modal, uploadState, percentUploaded, emojiPicker } = this.state;
 
     return (
       <Segment className="message__form">
+        {emojiPicker && (
+          <div>
+            <Picker
+              onSelect={this.handleAddEmoji}
+              set="apple"
+              className="emojipicker"
+              title="Pick your emoji"
+              emoji="point_up"
+            />
+          </div>
+        )}
         <Input
           fluid
           name="message"
           onChange={this.handleChange}
+          onKeyDown={this.handleKeyDown}
           value={message}
+          ref={node => (this.messageInputRef = node)}
           style={{ marginBottom: "0.7em" }}
-          label={<Button icon={"add"} />}
+          label={
+            <Button 
+              icon={emojiPicker ? "close" : "add"} 
+              onClick={emojiPicker ? this.handleCloseAddEmoji : this.handleTogglePicker} 
+              content={emojiPicker ? "Close" : null}
+              color={emojiPicker ? "red" : null }
+            />
+          }
           labelPosition="left"
           className={
             errors.some(error => error.message.includes("message"))
