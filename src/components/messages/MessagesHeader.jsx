@@ -32,7 +32,7 @@ class MessagesHeader extends Component {
         </Header>
 
         {/* Channel Search Input */}
-        <Header floated="right">
+        <Header floated="right" className="messages__header__search">
           <Input
             loading={searchLoading}
             onChange={handleSearchChange}

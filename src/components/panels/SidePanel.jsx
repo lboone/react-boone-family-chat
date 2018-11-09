@@ -15,6 +15,7 @@ class SidePanel extends Component {
         fixed="left"
         vertical
         style={{ background: primaryColor, fontSize: "1.2rem" }}
+        className="side__panel"
       >
         <UserPanel currentUser={currentUser} primaryColor={primaryColor} />
         <Starred currentUser={currentUser} />

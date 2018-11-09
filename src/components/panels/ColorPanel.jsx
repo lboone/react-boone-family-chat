@@ -160,6 +160,7 @@ class ColorPanel extends Component {
         vertical
         visible
         width="very thin"
+        className="color__panel"
       >
         <Divider />
         <Button icon="add" size="small" color="blue" onClick={this.openModal} />

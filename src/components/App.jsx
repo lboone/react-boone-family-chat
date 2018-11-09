@@ -25,7 +25,10 @@ const App = ({
       currentUser={currentUser}
       primaryColor={primaryColor}
     />
-    <Grid.Column style={{ marginLeft: 330, paddingTop: 25 }}>
+    <Grid.Column
+      style={{ marginLeft: 325, paddingTop: 25 }}
+      className="messages__column"
+    >
       <Messages
         key={currentChannel && currentChannel.id}
         currentChannel={currentChannel}
@@ -33,7 +36,11 @@ const App = ({
         isPrivateChannel={isPrivateChannel}
       />
     </Grid.Column>
-    <Grid.Column width={4} style={{ paddingTop: 25, paddingRight: 35 }}>
+    <Grid.Column
+      width={4}
+      className="computer only"
+      style={{ paddingTop: 25, paddingRight: 35 }}
+    >
       <MetaPanel
         key={currentChannel && currentChannel.name}
         currentChannel={currentChannel}
