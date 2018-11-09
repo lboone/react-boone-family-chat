@@ -1,7 +1,7 @@
 import React from "react";
 import uuidv4 from "uuid/v4";
 import firebase from "../../firebase";
-import { Segment, Button, Input, Message} from "semantic-ui-react";
+import { Segment, Button, Input, Message } from "semantic-ui-react";
 import { Picker, emojiIndex } from "emoji-mart";
 import "emoji-mart/css/emoji-mart.css";
 
@@ -72,12 +72,20 @@ class MessageForm extends React.Component {
         });
       } else {
         this.setState({ loading: true });
+        const { emojiPicker } = this.state.emojiPicker;
+        const handleEmojiPicker = emojiPicker ? true : false;
+
         getMessagesRef()
           .child(channel.id)
           .push()
           .set(this.createMessage())
           .then(() => {
-            this.setState({ loading: false, message: "", errors: [] });
+            this.setState({
+              loading: false,
+              message: "",
+              errors: [],
+              emojiPicker: handleEmojiPicker
+            });
             typingRef
               .child(channel.id)
               .child(user.uid)
@@ -238,11 +246,13 @@ class MessageForm extends React.Component {
           ref={node => (this.messageInputRef = node)}
           style={{ marginBottom: "0.7em" }}
           label={
-            <Button 
-              icon={emojiPicker ? "close" : "add"} 
-              onClick={emojiPicker ? this.handleCloseAddEmoji : this.handleTogglePicker} 
+            <Button
+              icon={emojiPicker ? "close" : "add"}
+              onClick={
+                emojiPicker ? this.handleCloseAddEmoji : this.handleTogglePicker
+              }
               content={emojiPicker ? "Close" : null}
-              color={emojiPicker ? "red" : null }
+              color={emojiPicker ? "red" : null}
             />
           }
           labelPosition="left"

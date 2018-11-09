@@ -7,6 +7,7 @@ import Message from "./Message";
 import firebase from "../../firebase";
 import { setUserPosts } from "../../actions";
 import Typing from "./Typing";
+import Skeleton from "./Skeleton";
 
 class Messages extends Component {
   state = {
@@ -35,15 +36,15 @@ class Messages extends Component {
       this.addUserStarsListeners(channel.id, user.uid);
     }
   }
-  componentDidUpdate(prevProps, prevState){
-    if(this.messagesEnd){
+  componentDidUpdate(prevProps, prevState) {
+    if (this.messagesEnd) {
       this.scrollToBottom();
     }
   }
 
   scrollToBottom = () => {
-    this.messagesEnd.scrollIntoView({behavior: 'smooth'});
-  }
+    this.messagesEnd.scrollIntoView({ behavior: "smooth" });
+  };
 
   componentWillUnmount() {
     if (this.state.channel) {
@@ -246,7 +247,14 @@ class Messages extends Component {
         <span className="user__typing">{user.name} is typing</span> <Typing />
       </div>
     ));
-
+  displayMessagesSkeleton = loading =>
+    loading ? (
+      <React.Fragment>
+        {[...Array(10)].map((_, i) => (
+          <Skeleton key={i} />
+        ))}
+      </React.Fragment>
+    ) : null;
   render() {
     const {
       messagesRef,
@@ -259,7 +267,8 @@ class Messages extends Component {
       searchLoading,
       privateChannel,
       isChannelStarred,
-      typingUsers
+      typingUsers,
+      messagesLoading
     } = this.state;
 
     return (
@@ -275,11 +284,12 @@ class Messages extends Component {
         />
         <Segment>
           <Comment.Group className="messages">
+            {this.displayMessagesSkeleton(messagesLoading)}
             {searchTerm
               ? this.displayMessages(searchResults)
               : this.displayMessages(messages)}
             {this.displayTypingUsers(typingUsers)}
-            <div ref={node => (this.messagesEnd = node)}></div>
+            <div ref={node => (this.messagesEnd = node)} />
           </Comment.Group>
         </Segment>
         <MessagesForm
