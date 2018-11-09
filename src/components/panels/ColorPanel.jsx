@@ -45,7 +45,7 @@ class ColorPanel extends Component {
     });
 
     this.state.usersRef.child(userId).on("value", snap => {
-      if (snap.val().primaryColor) {
+      if (snap.val() && snap.val().primaryColor) {
         this.setState(
           {
             primary: snap.val().primaryColor,

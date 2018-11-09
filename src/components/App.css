@@ -10,6 +10,12 @@ body,
 input {
   border-radius: 0px !important;
 }
+
+.ui.avatar.image,
+div.avatar img,
+.circular {
+  border-radius: 500rem !important;
+}
 div.ui.red.label {
   border-radius: 4px !important;
 }
