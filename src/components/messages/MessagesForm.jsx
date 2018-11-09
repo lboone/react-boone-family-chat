@@ -27,6 +27,13 @@ class MessageForm extends React.Component {
     emojiPicker: false
   };
 
+  componentWillUnmount() {
+    if (this.state.uploadTask !== null) {
+      this.state.uploadTask.cancel();
+      this.setState({ uploadTask: null });
+    }
+  }
+
   openModal = () => this.setState({ modal: true });
 
   closeModal = () => this.setState({ modal: false });
@@ -176,7 +183,7 @@ class MessageForm extends React.Component {
         });
       });
   };
-  handleKeyDown = () => {
+  handleKeyDown = event => {
     const { message, typingRef, channel, user } = this.state;
     if (message) {
       typingRef
@@ -188,6 +195,9 @@ class MessageForm extends React.Component {
         .child(channel.id)
         .child(user.uid)
         .remove();
+    }
+    if (event.keyCode === 13) {
+      this.sendMessage();
     }
   };
 
