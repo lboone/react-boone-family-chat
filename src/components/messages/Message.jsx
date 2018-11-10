@@ -1,5 +1,6 @@
 import React from "react";
 import { Comment, Image } from "semantic-ui-react";
+import { Link } from "react-router-dom";
 import moment from "moment";
 
 const isOwnMessage = (message, user) =>
@@ -10,6 +11,14 @@ const isImage = message => {
   return message.hasOwnProperty("image") && !message.hasOwnProperty("content");
 };
 
+const containsURL = ({ content }) => {
+  console.log(content);
+  var pattern = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
+  if (pattern.test(content)) {
+    return true;
+  }
+  return false;
+};
 const Message = ({ message, user }) => {
   return (
     <Comment>
@@ -18,10 +27,20 @@ const Message = ({ message, user }) => {
         <Comment.Author as="a">{message.user.name}</Comment.Author>
         <Comment.Metadata>{timeFromNow(message.timestamp)}</Comment.Metadata>
 
-        {isImage(message) ? (
-          <Image src={message.image} className="message__image" />
+        {containsURL(message) ? (
+          <div>
+            <a as={Link} href={message.content} target="_blank">
+              {message.content}
+            </a>
+          </div>
         ) : (
-          <Comment.Text>{message.content}</Comment.Text>
+          [
+            isImage(message) ? (
+              <Image src={message.image} className="message__image" />
+            ) : (
+              <Comment.Text>{message.content}</Comment.Text>
+            )
+          ]
         )}
       </Comment.Content>
     </Comment>
