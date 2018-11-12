@@ -46,8 +46,6 @@ class Messages extends Component {
       this.addListeners(channel.id);
       this.addUserStarsListeners(channel.id, user.uid);
     }
-
-    window.addEventListener("resize", this.updateDimensions);
   }
   componentDidUpdate(prevProps, prevState) {
     if (this.messagesEnd) {
@@ -58,20 +56,8 @@ class Messages extends Component {
   componentWillUnmount() {
     this.removeListeners(this.state.listeners);
     this.state.connectedRef.off();
-    window.removeEventListener("resize", this.updateDimensions);
   }
 
-  updateDimensions = () => {
-    const w = Math.max(
-      document.documentElement.clientWidth,
-      window.innerWidth || 0
-    );
-    const h = Math.max(
-      document.documentElement.clientHeight,
-      window.innerHeight || 0
-    );
-    console.log(w, h);
-  };
   addToListeners = (id, ref, event) => {
     const index = this.state.listeners.findIndex(listener => {
       return (

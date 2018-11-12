@@ -63,33 +63,46 @@ class ColorPanel extends Component {
     });
 
     this.state.usersRef.child(`${userId}/colors`).on("child_removed", snap => {
-      const newColors = this.state.userColors.filter(
-        color => color.key !== snap.key
-      );
-      this.setState({ userColors: newColors }, () => {
-        if (this.state.userColors.length === 0) {
-          this.setState(
-            {
-              primary: "#4c3c4c",
-              secondary: "#EEEEEE"
-            },
-            () => {
-              this.handleChooseColor({
-                primary: "#4c3c4c",
-                secondary: "#EEEEEE"
-              });
-            }
-          );
-        }
-      });
+      this.removeColorFromState(snap);
     });
   };
 
-  openModal = () => this.setState({ modal: true });
+  removeColorFromState = snap => {
+    const newColors = this.state.userColors.filter(
+      color => color.key !== snap.key
+    );
+    this.setState({ userColors: newColors }, () => {
+      if (this.state.userColors.length === 0) {
+        this.setState(
+          {
+            primary: "#4c3c4c",
+            secondary: "#EEEEEE"
+          },
+          () => {
+            this.handleChooseColor({
+              primary: "#4c3c4c",
+              secondary: "#EEEEEE"
+            });
+          }
+        );
+      }
+    });
+  };
+
+  openModal = () => {
+    if (this.state.userColors.length === 10) {
+      return alert(
+        "You have reached your limit of 10 colors, please delete one and try again."
+      );
+    } else {
+      this.setState({ modal: true });
+    }
+  };
   closeModal = () => this.setState({ modal: false });
 
   handleChangePrimary = color => this.setState({ primary: color.hex });
   handleChangeSecondary = color => this.setState({ secondary: color.hex });
+
   handleSaveColors = () => {
     if (this.state.primary && this.state.secondary) {
       this.saveColors(this.state.primary, this.state.secondary);
@@ -116,13 +129,14 @@ class ColorPanel extends Component {
       })
       .catch(err => console.error(err));
   };
-  removeColor = key => {
+  removeColor = color => {
     this.state.usersRef
       .child(`${this.state.user.uid}/colors`)
-      .child(key)
+      .child(color.key)
       .remove(err => {
         if (err) console.error(err);
       });
+    this.removeColorFromState(color);
   };
   displayUserColors = colors =>
     colors.length > 0 &&
@@ -134,7 +148,7 @@ class ColorPanel extends Component {
           size="small"
           name="remove"
           color="red"
-          onClick={() => this.removeColor(color.key)}
+          onClick={() => this.removeColor(color)}
         />
         <div
           className="color__container"
