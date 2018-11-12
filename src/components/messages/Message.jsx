@@ -1,6 +1,5 @@
 import React from "react";
 import { Comment, Image } from "semantic-ui-react";
-import { Link } from "react-router-dom";
 import moment from "moment";
 
 const isOwnMessage = (message, user) =>
@@ -12,14 +11,15 @@ const isImage = message => {
 };
 
 const containsURL = ({ content }) => {
-  console.log(content);
   var pattern = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
   if (pattern.test(content)) {
     return true;
   }
   return false;
 };
-const Message = ({ message, user }) => {
+const getKey = message => `${message.timestamp}-${message.user.id}`;
+
+const Message = ({ message, user, openModal }) => {
   return (
     <Comment>
       <Comment.Avatar src={message.user.avatar} />
@@ -29,16 +29,23 @@ const Message = ({ message, user }) => {
 
         {containsURL(message) ? (
           <div>
-            <a as={Link} href={message.content} target="_blank">
+            <a href={message.content} target="_blank">
               {message.content}
             </a>
           </div>
         ) : (
           [
             isImage(message) ? (
-              <Image src={message.image} className="message__image" />
+              <Image
+                onClick={() => openModal(message)}
+                key={getKey(message)}
+                src={message.image}
+                className="message__image"
+              />
             ) : (
-              <Comment.Text>{message.content}</Comment.Text>
+              <Comment.Text key={getKey(message)}>
+                {message.content}
+              </Comment.Text>
             )
           ]
         )}

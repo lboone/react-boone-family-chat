@@ -65,6 +65,7 @@ div.ui.red.label {
 
 .message__image {
   padding: 1em;
+  cursor: pointer;
 }
 
 /* ProgressBar.jsx */

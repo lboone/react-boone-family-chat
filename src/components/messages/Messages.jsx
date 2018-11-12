@@ -1,5 +1,12 @@
 import React, { Component } from "react";
-import { Segment, Comment } from "semantic-ui-react";
+import {
+  Segment,
+  Comment,
+  Modal,
+  Image,
+  Button,
+  Icon
+} from "semantic-ui-react";
 import { connect } from "react-redux";
 import MessagesHeader from "./MessagesHeader";
 import MessagesForm from "./MessagesForm";
@@ -27,7 +34,9 @@ class Messages extends Component {
     typingRef: firebase.database().ref("typing"),
     typingUsers: [],
     connectedRef: firebase.database().ref(".info/connected"),
-    listeners: []
+    listeners: [],
+    modal: false,
+    modalImage: ""
   };
   componentDidMount() {
     const { channel, user, listeners } = this.state;
@@ -204,8 +213,16 @@ class Messages extends Component {
         key={message.timestamp}
         message={message}
         user={this.state.user}
+        openModal={this.openModal}
       />
     ));
+
+  closeModal = () => {
+    this.setState({ modal: false, modalImage: "" });
+  };
+  openModal = message => {
+    this.setState({ modal: true, modalImage: message.image });
+  };
 
   displayChannelName = channel => {
     return channel
@@ -305,7 +322,9 @@ class Messages extends Component {
       privateChannel,
       isChannelStarred,
       typingUsers,
-      messagesLoading
+      messagesLoading,
+      modal,
+      modalImage
     } = this.state;
 
     return (
@@ -336,6 +355,18 @@ class Messages extends Component {
           isPrivateChannel={privateChannel}
           getMessagesRef={this.getMessagesRef}
         />
+
+        <Modal basic open={modal} onClose={this.closeModal}>
+          <Modal.Header>View Image</Modal.Header>
+          <Modal.Content>
+            <Image size="massive" src={modalImage} />
+          </Modal.Content>
+          <Modal.Actions>
+            <Button color="green" inverted onClick={this.closeModal}>
+              <Icon name="checkmark" /> Done
+            </Button>
+          </Modal.Actions>
+        </Modal>
       </React.Fragment>
     );
   }
