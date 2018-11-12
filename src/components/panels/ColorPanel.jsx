@@ -90,9 +90,9 @@ class ColorPanel extends Component {
   };
 
   openModal = () => {
-    if (this.state.userColors.length === 10) {
+    if (this.state.userColors.length === 8) {
       return alert(
-        "You have reached your limit of 10 colors, please delete one and try again."
+        "You have reached your limit of 8 colors, please delete one and try again."
       );
     } else {
       this.setState({ modal: true });
